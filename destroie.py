@@ -2,6 +2,7 @@ import requests
 from time import sleep
 from os import system
 from brute.arte import execute
+import asyncio
 
 
 
@@ -15,22 +16,32 @@ feixa = '\033[m'
 
 
 url: str = input(f'{vermelhor} URL: {feixa}')
-if not url.endswith('/'):
-    url = url + '/'
+
+if not url.startswith('https://') and not url.endswith('/'):
+	url = 'https://'+url
+	url = url + '/'
 
 
-with open('brute/big.txt') as f:
-    for pecorre in f.readlines():
 
-        linhas = pecorre.strip()
 
-        URL_COMPLETA: str = url + linhas
+async def EXECUTE():
+    with open('brute/big.txt') as f:
+        for pecorre in f.readlines():
+            linhas = pecorre.strip()
+            URL_COMPLETA: str = url + linhas
+            req = requests.get(URL_COMPLETA)
+            CODIGO = req.status_code
+            print(f'{verde}{URL_COMPLETA}{feixa}: {vermelhor}{CODIGO}{feixa}')
+          
 
-        req = requests.get(URL_COMPLETA)
 
-        CODIGO = req.status_code
-        #if CODIGO != 404:
-        print(f'{verde}{URL_COMPLETA}{feixa}: {vermelhor}{CODIGO}{feixa}')
-        #sleep(3)
+async def solicita():
+    tarefa = asyncio.create_task(EXECUTE())
+    
+    await tarefa
+
+
+
+asyncio.run(solicita())
 
             
